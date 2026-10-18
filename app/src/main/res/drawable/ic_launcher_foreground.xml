@@ -1,0 +1,31 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="14"
+        android:translateY="14"
+        android:scaleX="0.74"
+        android:scaleY="0.74">
+        <!-- Shield Background -->
+        <path
+            android:fillColor="#00A86B"
+            android:pathData="M54,10 C78,10 94,22 94,46 C94,76 54,102 54,102 C54,102 14,76 14,46 C14,22 30,10 54,10 Z" />
+
+        <!-- Wallet Body -->
+        <path
+            android:fillColor="#0B1B3D"
+            android:pathData="M32,36 L76,36 C80.4,36 84,39.6 84,44 L84,72 C84,76.4 80.4,80 76,80 L32,80 C27.6,80 24,76.4 24,72 L24,44 C24,39.6 27.6,36 32,36 Z" />
+
+        <!-- Accent Card Flap -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M28,42 L80,42 C81.5,42 83,43.5 83,45 L83,49 C83,50.5 81.5,52 80,52 L28,52 C26.5,52 25,50.5 25,49 L25,45 C25,43.5 26.5,42 28,42 Z" />
+
+        <!-- Verified Checkmark -->
+        <path
+            android:fillColor="#00A86B"
+            android:pathData="M48,64 L39,55 L42,52 L48,58 L67,39 L70,42 Z" />
+    </group>
+</vector>

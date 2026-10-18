@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Rounded Shield Background -->
+    <path
+        android:fillColor="#00A86B"
+        android:pathData="M60,10 C85,10 102,22 102,48 C102,80 60,110 60,110 C60,110 18,80 18,48 C18,22 35,10 60,10 Z" />
+
+    <!-- Wallet / Document Silhouette inside shield -->
+    <path
+        android:fillColor="#0B1B3D"
+        android:pathData="M38,36 L82,36 C86.4,36 90,39.6 90,44 L90,76 C90,80.4 86.4,84 82,84 L38,84 C33.6,84 30,80.4 30,76 L30,44 C30,39.6 33.6,36 38,36 Z" />
+
+    <!-- Wallet Flap Accent -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,44 L86,44 C88.2,44 90,45.8 90,48 L90,52 C90,54.2 88.2,56 86,56 L34,56 C31.8,56 30,54.2 30,52 L30,48 C30,45.8 31.8,44 34,44 Z" />
+
+    <!-- Checkmark of Certified Warranty -->
+    <path
+        android:fillColor="#00A86B"
+        android:pathData="M52,65 L44,57 L47,54 L52,59 L73,38 L76,41 Z" />
+</vector>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Primary - Deep Navy & Trust Indigo -->
+    <color name="brand_primary">#0B1B3D</color>
+    <color name="brand_primary_variant">#162A5A</color>
+    <color name="brand_primary_container">#1E3A70</color>
+
+    <!-- Accent - Emerald / Mint Teal -->
+    <color name="brand_accent">#00A86B</color>
+    <color name="brand_accent_variant">#0D9488</color>
+    <color name="brand_accent_container">#D1FAE5</color>
+
+    <!-- Neutrals - Warm Off-White & Charcoal -->
+    <color name="background_light">#F8F9FA</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="surface_variant_light">#F1F3F5</color>
+    <color name="text_primary_light">#1A1D20</color>
+    <color name="text_secondary_light">#6C757D</color>
+
+    <!-- Dark Mode Neutrals -->
+    <color name="background_dark">#0E131F</color>
+    <color name="surface_dark">#181F30</color>
+    <color name="surface_variant_dark">#222C42</color>
+    <color name="text_primary_dark">#F8F9FA</color>
+    <color name="text_secondary_dark">#A0AEC0</color>
+
+    <!-- Status Colors -->
+    <color name="status_active">#10B981</color>
+    <color name="status_active_bg">#D1FAE5</color>
+    <color name="status_expiring">#F59E0B</color>
+    <color name="status_expiring_bg">#FEF3C7</color>
+    <color name="status_expired">#EF4444</color>
+    <color name="status_expired_bg">#FEE2E2</color>
+    <color name="status_unknown">#6B7280</color>
+    <color name="status_unknown_bg">#F3F4F6</color>
+</resources>

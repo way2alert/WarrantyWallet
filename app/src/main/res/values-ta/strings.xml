@@ -1,0 +1,18 @@
+<resources>
+    <!-- App Identity -->
+    <string name="app_name">வாரண்டி வாலட்</string>
+    <string name="app_tagline">ஒவ்வொரு ரசீதையும் வைத்திருங்கள். உத்தரவாதத்தை நினைவில் கொள்ளுங்கள்.</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">முகப்பு</string>
+    <string name="nav_products">பொருட்கள்</string>
+    <string name="nav_documents">ரசீதுகள்</string>
+    <string name="nav_reminders">நினைவூட்டல்கள்</string>
+    <string name="nav_settings">அமைப்புகள்</string>
+
+    <!-- Product Statuses -->
+    <string name="status_active">செயலில் உள்ளது</string>
+    <string name="status_expiring_soon">விரைவில் முடிவடைகிறது</string>
+    <string name="status_expired">காலாவதியானது</string>
+    <string name="status_unknown">தேதி சேர்க்கப்படவில்லை</string>
+</resources>

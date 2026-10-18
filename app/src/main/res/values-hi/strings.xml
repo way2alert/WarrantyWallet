@@ -1,0 +1,75 @@
+<resources>
+    <!-- App Identity -->
+    <string name="app_name">वारंटी वॉलेट</string>
+    <string name="app_tagline">हर बिल संभालें। हर वारंटी याद रखें। सर्विस की तारीख कभी न भूलें।</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">छोड़ें</string>
+    <string name="onboarding_next">आगे</string>
+    <string name="onboarding_get_started">शुरू करें</string>
+    <string name="onboarding_title_1">बिल खोने का डर खत्म</string>
+    <string name="onboarding_desc_1">कागजी बिल स्कैन करें या पीडीएफ जोड़ें। आपके सभी खरीद बिल एक ही सुरक्षित जगह पर।</string>
+    <string name="onboarding_title_2">समय पर वारंटी अलर्ट</string>
+    <string name="onboarding_desc_2">वारंटी खत्म होने से 30 दिन, 7 दिन और 1 दिन पहले पाएं याद दिलाने वाला अलर्ट।</string>
+    <string name="onboarding_title_3">ऑफलाइन सुविधा और क्लाउड बैकअप</string>
+    <string name="onboarding_desc_3">बिना इंटरनेट भी पूरी तरह काम करता है। बैकअप के लिए कभी भी साइन इन करें।</string>
+
+    <!-- Authentication -->
+    <string name="auth_sign_in_title">वारंटी वॉलेट में आपका स्वागत है</string>
+    <string name="auth_sign_in_subtitle">अपनी वारंटी को क्लाउड बैकअप के साथ सुरक्षित रखें</string>
+    <string name="auth_email_label">ईमेल पता</string>
+    <string name="auth_password_label">पासवर्ड</string>
+    <string name="auth_sign_in_button">साइन इन करें</string>
+    <string name="auth_sign_up_button">नया खाता बनाएं</string>
+    <string name="auth_continue_guest">अतिथि के रूप में जारी रखें (ऑफलाइन)</string>
+    <string name="auth_google_sign_in">Google से जारी रखें</string>
+    <string name="auth_forgot_password">पासवर्ड भूल गए?</string>
+    <string name="auth_reset_password">पासवर्ड रीसेट करें</string>
+    <string name="auth_already_have_account">पहले से खाता है? साइन इन करें</string>
+    <string name="auth_dont_have_account">खाता नहीं है? नया बनाएं</string>
+    <string name="auth_guest_notice">अतिथि मोड सारा डेटा इस फोन पर सुरक्षित रखता है। आप बाद में बैकअप जोड़ सकते हैं।</string>
+    <string name="auth_logout">लॉग आउट</string>
+    <string name="auth_delete_account">खाता हटाएं</string>
+    <string name="auth_delete_confirm">क्या आप वाकई अपना खाता हटाना चाहते हैं? सभी क्लाउड दस्तावेज़ हमेशा के लिए मिटा दिए जाएंगे।</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">होम</string>
+    <string name="nav_products">प्रोडक्ट्स</string>
+    <string name="nav_documents">बिल</string>
+    <string name="nav_reminders">अलर्ट</string>
+    <string name="nav_settings">सेटिंग्स</string>
+
+    <!-- Home Dashboard -->
+    <string name="dashboard_greeting">नमस्ते,</string>
+    <string name="dashboard_guest_user">वारंटी रक्षक</string>
+    <string name="dashboard_stat_total">कुल सामान</string>
+    <string name="dashboard_stat_active">सक्रिय</string>
+    <string name="dashboard_stat_expiring">जल्द खत्म होने वाले</string>
+    <string name="dashboard_stat_expired">समाप्त</string>
+    <string name="dashboard_stat_unknown">तारीख अज्ञात</string>
+    <string name="dashboard_expiring_soon_title">जल्द खत्म होने वाले (30 दिन से कम)</string>
+    <string name="dashboard_expiring_soon_subtitle">वारंटी खत्म होने से पहले जांच लें</string>
+    <string name="dashboard_view_all">सभी देखें</string>
+    <string name="dashboard_recent_added">हाल ही में जोड़े गए</string>
+    <string name="dashboard_quick_add">वारंटी जोड़ें</string>
+    <string name="dashboard_empty_title">अभी तक कोई वारंटी नहीं जुड़ी</string>
+    <string name="dashboard_empty_desc">अपना पहला बिल स्कैन करने के लिए नीचे दिए गए बटन पर टैप करें!</string>
+    <string name="dashboard_categories">श्रेणी अनुसार देखें</string>
+
+    <!-- Product Statuses -->
+    <string name="status_active">सक्रिय</string>
+    <string name="status_expiring_soon">जल्द समाप्त</string>
+    <string name="status_expired">समाप्त</string>
+    <string name="status_unknown">तारीख नहीं जोड़ी गई</string>
+
+    <!-- Actions -->
+    <string name="action_ok">ठीक है</string>
+    <string name="action_cancel">रद्द करें</string>
+    <string name="action_save">सहेजें</string>
+    <string name="action_delete">हटाएं</string>
+    <string name="action_retry">पुनः प्रयास करें</string>
+    <string name="btn_save_product">वारंटी सहेजें</string>
+    <string name="state_loading">लोड हो रहा है...</string>
+    <string name="state_offline">ऑफलाइन मोड</string>
+    <string name="state_success_saved">सफलतापूर्वक सहेजा गया!</string>
+</resources>
