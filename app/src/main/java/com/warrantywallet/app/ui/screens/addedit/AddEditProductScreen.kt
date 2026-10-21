@@ -67,6 +67,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -75,6 +77,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -275,11 +278,50 @@ fun AddEditProductScreen(
     var showSourceSheet by remember { mutableStateOf(productId == null && uiState.billUri == null) }
     var categoryExpanded by remember { mutableStateOf(false) }
 
+    val scope = rememberCoroutineScope()
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success && tempCameraUri != null) {
             viewModel.onBillSelected(context, tempCameraUri!!)
+        }
+    }
+
+    fun launchCameraInternal() {
+        try {
+            val photoFile = File(context.cacheDir, "camera_receipt_${System.currentTimeMillis()}.jpg")
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", photoFile)
+            tempCameraUri = uri
+            cameraLauncher.launch(uri)
+        } catch (e: Exception) {
+            scope.launch {
+                snackbarHostState.showSnackbar("Unable to open camera: ${e.localizedMessage ?: "Unknown error"}")
+            }
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            launchCameraInternal()
+        } else {
+            scope.launch {
+                snackbarHostState.showSnackbar("Camera permission is required to photograph bills. You can also pick from Gallery.")
+            }
+        }
+    }
+
+    fun requestCameraAndLaunch() {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            launchCameraInternal()
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
@@ -642,10 +684,7 @@ fun AddEditProductScreen(
                     subtitle = "Snap a clear photo of your paper receipt",
                     onClick = {
                         showSourceSheet = false
-                        val photoFile = File(context.cacheDir, "camera_receipt_${System.currentTimeMillis()}.jpg")
-                        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", photoFile)
-                        tempCameraUri = uri
-                        cameraLauncher.launch(uri)
+                        requestCameraAndLaunch()
                     }
                 )
 

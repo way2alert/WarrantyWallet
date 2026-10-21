@@ -1,6 +1,11 @@
 package com.warrantywallet.app.ui.screens.auth
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,15 +25,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -46,6 +54,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -55,6 +66,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.warrantywallet.app.R
 import com.warrantywallet.app.core.designsystem.components.PrimaryButton
 import com.warrantywallet.app.core.designsystem.components.SecondaryButton
 import com.warrantywallet.app.data.repository.AuthRepository
@@ -111,6 +126,25 @@ class AuthViewModel(
         }
     }
 
+    fun signInWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = authRepository.signInWithGoogle(idToken)
+            _isLoading.value = false
+            if (result.isSuccess) {
+                _successEvent.emit(Unit)
+            } else {
+                _errorMessage.emit(result.exceptionOrNull()?.localizedMessage ?: "Google Sign-In failed")
+            }
+        }
+    }
+
+    fun onGoogleSignInError(message: String) {
+        viewModelScope.launch {
+            _errorMessage.emit(message)
+        }
+    }
+
     fun resetPassword(email: String) {
         if (email.isBlank()) {
             viewModelScope.launch { _errorMessage.emit("Please enter your email to reset password") }
@@ -145,9 +179,47 @@ fun AuthScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+    var showGoogleSetupDialog by remember { mutableStateOf(false) }
 
     val isLoading by viewModel.isLoading.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    // Safely check for Firebase Web Client ID
+    val webClientId = remember(context) {
+        try {
+            val resId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
+            if (resId != 0) context.getString(resId) else null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    // Google Sign-In Activity Result Launcher
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                val idToken = account?.idToken
+                if (!idToken.isNullOrBlank()) {
+                    viewModel.signInWithGoogle(idToken)
+                } else {
+                    viewModel.onGoogleSignInError("Google ID token not received. Please verify Web Client ID.")
+                }
+            } catch (e: ApiException) {
+                val msg = when (e.statusCode) {
+                    12500 -> "Google Sign-In failed (status code 12500). Please ensure Google Play Services is updated."
+                    10 -> "Google Sign-In configuration error (Developer Error). Ensure SHA-1 fingerprint is added in Firebase Console."
+                    7 -> "Network error during Google Sign-In. Please check your internet connection."
+                    else -> "Google Sign-In canceled or failed: ${e.localizedMessage ?: "Error ${e.statusCode}"}"
+                }
+                viewModel.onGoogleSignInError(msg)
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.successEvent.collect {
@@ -159,6 +231,45 @@ fun AuthScreen(
         viewModel.errorMessage.collect { message ->
             snackbarHostState.showSnackbar(message)
         }
+    }
+
+    // Setup Guide Dialog if Google Web Client ID is not yet generated
+    if (showGoogleSetupDialog) {
+        AlertDialog(
+            onDismissRequest = { showGoogleSetupDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            title = {
+                Text(
+                    text = "Google Sign-In Setup",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Google Sign-In is built into this app. To activate it in your Firebase project:",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "1. Open Firebase Console -> Authentication -> Sign-in method.\n2. Click 'Google' and toggle Enable.\n3. Add your SHA-1 fingerprint.\n4. Download the updated google-services.json.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showGoogleSetupDialog = false }) {
+                    Text("OK, Understood")
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -173,12 +284,12 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Brand Logo
             Box(
                 modifier = Modifier
-                    .size(72.dp)
+                    .size(68.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
@@ -187,11 +298,11 @@ fun AuthScreen(
                     imageVector = Icons.Default.Shield,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(38.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = if (isSignUpMode) "Create Your Account" else "Welcome Back",
@@ -204,10 +315,66 @@ fun AuthScreen(
                 text = "Keep every bill. Remember every warranty.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 6.dp)
+                modifier = Modifier.padding(top = 4.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // Google Sign-In Button (Prominent & Fast)
+            OutlinedButton(
+                onClick = {
+                    if (webClientId != null) {
+                        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(webClientId)
+                            .requestEmail()
+                            .build()
+                        val client = GoogleSignIn.getClient(context, gso)
+                        googleSignInLauncher.launch(client.signInIntent)
+                    } else {
+                        showGoogleSetupDialog = true
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_google_logo),
+                        contentDescription = "Google Logo",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = stringResource(R.string.auth_google_sign_in),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HorizontalDivider(modifier = Modifier.weight(1f))
+                Text(
+                    text = "  OR CONTINUE WITH EMAIL  ",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                HorizontalDivider(modifier = Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Email Field
             OutlinedTextField(
@@ -221,7 +388,7 @@ fun AuthScreen(
                 shape = RoundedCornerShape(12.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Password Field
             OutlinedTextField(
@@ -258,16 +425,16 @@ fun AuthScreen(
                     }
                 }
             } else {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.padding(16.dp))
             } else {
                 PrimaryButton(
-                    text = if (isSignUpMode) "Sign Up" else "Sign In",
+                    text = if (isSignUpMode) "Sign Up with Email" else "Sign In with Email",
                     onClick = {
                         if (isSignUpMode) viewModel.signUp(email, password)
                         else viewModel.signIn(email, password)
@@ -275,7 +442,7 @@ fun AuthScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(onClick = { isSignUpMode = !isSignUpMode }) {
                 Text(
@@ -284,22 +451,11 @@ fun AuthScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Divider(modifier = Modifier.weight(1f))
-                Text(
-                    text = "  OR  ",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Divider(modifier = Modifier.weight(1f))
-            }
+            HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Guest Mode Button
             SecondaryButton(
@@ -307,7 +463,7 @@ fun AuthScreen(
                 onClick = { viewModel.continueAsGuest() }
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = "Guest mode saves all bills safely on this device. You can connect a cloud backup anytime later in Settings.",
@@ -317,7 +473,7 @@ fun AuthScreen(
                 lineHeight = 16.sp
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

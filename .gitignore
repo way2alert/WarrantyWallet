@@ -19,3 +19,4 @@ app/build/
 .kotlin/
 F:/.gradle/
 F:/tmp/
+.vscode/

@@ -1,6 +1,7 @@
 package com.warrantywallet.app.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.warrantywallet.app.core.datastore.PreferenceManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,6 +73,20 @@ class AuthRepository(
         val auth = firebaseAuth ?: return Result.failure(Exception("Firebase Auth not initialized."))
         return try {
             val result = auth.createUserWithEmailAndPassword(email, pass).await()
+            val uid = result.user?.uid ?: ""
+            preferenceManager.setGuestMode(false)
+            preferenceManager.setUserId(uid)
+            Result.success(uid)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun signInWithGoogle(idToken: String): Result<String> {
+        val auth = firebaseAuth ?: return Result.failure(Exception("Firebase Auth not initialized."))
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val result = auth.signInWithCredential(credential).await()
             val uid = result.user?.uid ?: ""
             preferenceManager.setGuestMode(false)
             preferenceManager.setUserId(uid)
