@@ -23,6 +23,9 @@ class PreferenceManager(private val context: Context) {
     private val KEY_USER_ID = stringPreferencesKey("user_id")
     private val KEY_IS_GUEST = booleanPreferencesKey("is_guest")
     private val KEY_LAST_SYNC_MILLIS = longPreferencesKey("last_sync_millis")
+    private val KEY_IS_PRO_USER = booleanPreferencesKey("is_pro_user")
+    private val KEY_PRO_EXPIRY_MILLIS = longPreferencesKey("pro_expiry_millis")
+    private val KEY_AFFILIATE_PARTNER_URL = stringPreferencesKey("affiliate_partner_url")
 
     val isOnboardingCompleted: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[KEY_ONBOARDING_COMPLETED] ?: false
@@ -93,6 +96,35 @@ class PreferenceManager(private val context: Context) {
     suspend fun setLastSyncMillis(millis: Long) {
         context.dataStore.edit { prefs ->
             prefs[KEY_LAST_SYNC_MILLIS] = millis
+        }
+    }
+
+    val isProUser: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[KEY_IS_PRO_USER] ?: false
+    }
+
+    val proExpiryMillis: Flow<Long?> = context.dataStore.data.map { prefs ->
+        prefs[KEY_PRO_EXPIRY_MILLIS]
+    }
+
+    suspend fun setProUser(isPro: Boolean, expiryMillis: Long = 0L) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_IS_PRO_USER] = isPro
+            if (isPro && expiryMillis > 0L) {
+                prefs[KEY_PRO_EXPIRY_MILLIS] = expiryMillis
+            } else if (!isPro) {
+                prefs.remove(KEY_PRO_EXPIRY_MILLIS)
+            }
+        }
+    }
+
+    val affiliatePartnerUrl: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[KEY_AFFILIATE_PARTNER_URL] ?: "https://onsitego.com/extended-warranty"
+    }
+
+    suspend fun setAffiliatePartnerUrl(url: String) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_AFFILIATE_PARTNER_URL] = url
         }
     }
 

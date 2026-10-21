@@ -40,6 +40,8 @@ import com.warrantywallet.app.ui.screens.reminders.RemindersScreen
 import com.warrantywallet.app.ui.screens.reminders.RemindersViewModel
 import com.warrantywallet.app.ui.screens.search.SearchScreen
 import com.warrantywallet.app.ui.screens.search.SearchViewModel
+import com.warrantywallet.app.ui.screens.pro.ProSubscriptionScreen
+import com.warrantywallet.app.ui.screens.pro.ProSubscriptionViewModel
 import com.warrantywallet.app.ui.screens.settings.SettingsScreen
 import com.warrantywallet.app.ui.screens.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -152,6 +154,9 @@ fun MainAppNavigation(
                     },
                     onNavigateToSearch = {
                         navController.navigate("search")
+                    },
+                    onNavigateToProSubscription = {
+                        navController.navigate(Screen.ProSubscription.route)
                     }
                 )
             }
@@ -238,6 +243,9 @@ fun MainAppNavigation(
                     viewModel = settingsVm,
                     onNavigateToAuth = {
                         navController.navigate(Screen.Auth.route)
+                    },
+                    onNavigateToProSubscription = {
+                        navController.navigate(Screen.ProSubscription.route)
                     }
                 )
             }
@@ -251,6 +259,15 @@ fun MainAppNavigation(
                     onNavigateToProductDetail = { productId ->
                         navController.navigate(Screen.ProductDetail.createRoute(productId))
                     }
+                )
+            }
+
+            // Pro Subscription Screen
+            composable(Screen.ProSubscription.route) {
+                val proVm = rememberProSubscriptionViewModel(app)
+                ProSubscriptionScreen(
+                    viewModel = proVm,
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
         }
@@ -301,4 +318,9 @@ private fun rememberAuthViewModel(app: WarrantyWalletApp): AuthViewModel {
 @Composable
 private fun rememberSearchViewModel(app: WarrantyWalletApp): SearchViewModel {
     return viewModel { SearchViewModel(app.productRepository) }
+}
+
+@Composable
+private fun rememberProSubscriptionViewModel(app: WarrantyWalletApp): ProSubscriptionViewModel {
+    return viewModel { ProSubscriptionViewModel(app.preferenceManager) }
 }

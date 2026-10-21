@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -134,7 +135,8 @@ fun HomeScreen(
     onNavigateToProductDetail: (String) -> Unit,
     onNavigateToAllProducts: () -> Unit,
     onNavigateToCategory: (Category) -> Unit,
-    onNavigateToSearch: () -> Unit
+    onNavigateToSearch: () -> Unit,
+    onNavigateToProSubscription: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -186,11 +188,41 @@ fun HomeScreen(
                             )
                         }
 
-                        // Search entry button
-                        IconButtonWithBackground(
-                            icon = Icons.Default.Search,
-                            onClick = onNavigateToSearch
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // PRO Crown Badge Button
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color(0xFFF59E0B),
+                                modifier = Modifier.clickable { onNavigateToProSubscription() }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.WorkspacePremium,
+                                        contentDescription = "PRO",
+                                        tint = Color.Black,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "PRO",
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 12.sp,
+                                        color = Color.Black
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            // Search entry button
+                            IconButtonWithBackground(
+                                icon = Icons.Default.Search,
+                                onClick = onNavigateToSearch
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))

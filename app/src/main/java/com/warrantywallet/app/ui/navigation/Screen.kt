@@ -22,6 +22,7 @@ sealed class Screen(val route: String) {
     data object Reminders : Screen("reminders")
     data object Documents : Screen("documents")
     data object Settings : Screen("settings")
+    data object ProSubscription : Screen("pro_subscription")
 }
 
 sealed class BottomNavItem(val route: String, val title: String, val icon: ImageVector) {

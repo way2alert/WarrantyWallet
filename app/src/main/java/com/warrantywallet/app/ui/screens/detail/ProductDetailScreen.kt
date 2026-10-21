@@ -3,6 +3,7 @@ package com.warrantywallet.app.ui.screens.detail
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -31,6 +33,7 @@ import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -259,6 +262,105 @@ fun ProductDetailScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Extended Warranty & AMC Service Partner Monetization Card
+                if (status == WarrantyStatus.EXPIRING_SOON || status == WarrantyStatus.EXPIRED) {
+                    val isExpiring = status == WarrantyStatus.EXPIRING_SOON
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isExpiring) Color(0xFFFEF3C7) else Color(0xFFF1F5F9)
+                        ),
+                        border = BorderStroke(
+                            1.dp,
+                            if (isExpiring) Color(0xFFF59E0B) else Color(0xFF94A3B8)
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(CircleShape)
+                                        .background(if (isExpiring) Color(0xFFD97706) else Color(0xFF475569)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = if (isExpiring) Icons.Default.Shield else Icons.Default.Build,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = if (isExpiring) "Extend Warranty Before Expiry" else "Doorstep Service & AMC Available",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isExpiring) Color(0xFF92400E) else Color(0xFF1E293B)
+                                    )
+                                    Text(
+                                        text = if (isExpiring) "Save up to ₹8,000 on repair costs" else "Authorized technician inspection",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (isExpiring) Color(0xFFB45309) else Color(0xFF64748B)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Text(
+                                text = if (isExpiring) {
+                                    "Your manufacturer warranty is ending soon. Protect ${product.name} against sudden breakdowns, electrical failures, and costly parts replacement for up to 2 additional years."
+                                } else {
+                                    "Your warranty has expired. Book verified brand service, routine AC/appliance maintenance, or parts replacement with doorstep warranty."
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (isExpiring) Color(0xFF78350F) else Color(0xFF334155),
+                                lineHeight = 18.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Button(
+                                onClick = {
+                                    val url = if (isExpiring) {
+                                        "https://onsitego.com/extended-warranty"
+                                    } else {
+                                        "https://www.urbancompany.com"
+                                    }
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                        context.startActivity(intent)
+                                    } catch (_: Exception) {}
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isExpiring) Color(0xFFD97706) else Color(0xFF0F172A),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = if (isExpiring) "Check Protection Plans" else "Book Technician / Service",
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.OpenInNew,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // Dates Section Card
                 Card(
