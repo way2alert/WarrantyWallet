@@ -72,7 +72,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProSubscriptionViewModel(
-    private val preferenceManager: PreferenceManager
+    private val preferenceManager: PreferenceManager,
+    private val billingManager: com.warrantywallet.app.core.billing.BillingManager
 ) : ViewModel() {
 
     val isProUser: StateFlow<Boolean> = preferenceManager.isProUser.stateIn(
@@ -81,27 +82,18 @@ class ProSubscriptionViewModel(
         initialValue = false
     )
 
-    fun activatePro(isAnnual: Boolean, onActivated: () -> Unit) {
-        viewModelScope.launch {
-            val durationDays = if (isAnnual) 365L else 30L
-            val expiry = System.currentTimeMillis() + (durationDays * 24 * 60 * 60 * 1000)
-            preferenceManager.setProUser(true, expiry)
-            onActivated()
+    fun startSubscriptionFlow(activity: android.app.Activity?, isAnnual: Boolean, onError: (String) -> Unit) {
+        if (activity == null) {
+            onError("Unable to launch checkout. Please restart the app.")
+            return
         }
+        billingManager.launchSubscription(activity, isAnnual, onError)
     }
 
     fun applyPromoCode(code: String, onResult: (Boolean, String) -> Unit) {
         viewModelScope.launch {
-            if (code.trim().equals("FOUNDER2026", ignoreCase = true) ||
-                code.trim().equals("PROFREE", ignoreCase = true) ||
-                code.trim().equals("VIPWALLET", ignoreCase = true)
-            ) {
-                val expiry = System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000)
-                preferenceManager.setProUser(true, expiry)
-                onResult(true, "PRO Membership Activated for 1 Year!")
-            } else {
-                onResult(false, "Invalid promo code. Please check and try again.")
-            }
+            // Production validation: All bypass codes removed
+            onResult(false, "No active promotional campaign found for '$code'.")
         }
     }
 }
@@ -118,6 +110,8 @@ fun ProSubscriptionScreen(
     var promoCode by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? android.app.Activity
 
     val goldColor = Color(0xFFD97706)
     val goldLight = Color(0xFFFEF3C7)
@@ -259,9 +253,9 @@ fun ProSubscriptionScreen(
                 // Upgrade Button
                 Button(
                     onClick = {
-                        viewModel.activatePro(selectedPlanAnnual) {
+                        viewModel.startSubscriptionFlow(activity, selectedPlanAnnual) { errorMsg ->
                             scope.launch {
-                                snackbarHostState.showSnackbar("Welcome to Warranty Wallet PRO! 🎉")
+                                snackbarHostState.showSnackbar(errorMsg)
                             }
                         }
                     },

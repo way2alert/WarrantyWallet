@@ -23,9 +23,20 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("${rootDir}/release.jks")
+            storePassword = "WarrantyWallet@2026"
+            keyAlias = "warrantywallet"
+            keyPassword = "WarrantyWallet@2026"
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -101,6 +112,9 @@ dependencies {
 
     // Google Play Services Auth for Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    // Google Play Billing
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 
     // Firebase (Using BoM)
     val firebaseBom = platform("com.google.firebase:firebase-bom:33.5.1")

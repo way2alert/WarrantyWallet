@@ -20,3 +20,5 @@ app/build/
 F:/.gradle/
 F:/tmp/
 .vscode/
+*.jks
+*.keystore

@@ -322,5 +322,5 @@ private fun rememberSearchViewModel(app: WarrantyWalletApp): SearchViewModel {
 
 @Composable
 private fun rememberProSubscriptionViewModel(app: WarrantyWalletApp): ProSubscriptionViewModel {
-    return viewModel { ProSubscriptionViewModel(app.preferenceManager) }
+    return viewModel { ProSubscriptionViewModel(app.preferenceManager, app.billingManager) }
 }

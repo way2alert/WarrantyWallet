@@ -29,6 +29,9 @@ class WarrantyWalletApp : Application() {
     lateinit var productRepository: ProductRepository
         private set
 
+    lateinit var billingManager: com.warrantywallet.app.core.billing.BillingManager
+        private set
+
     override fun onCreate() {
         super.onCreate()
 
@@ -39,6 +42,11 @@ class WarrantyWalletApp : Application() {
         alarmScheduler = AlarmScheduler(this)
         firestoreSyncService = FirestoreSyncService()
         authRepository = AuthRepository(preferenceManager)
+        billingManager = com.warrantywallet.app.core.billing.BillingManager(
+            context = this,
+            preferenceManager = preferenceManager,
+            coroutineScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main)
+        ).apply { initialize() }
         productRepository = ProductRepository(
             productDao = database.productDao(),
             reminderDao = database.reminderDao(),
